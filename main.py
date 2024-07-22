@@ -1,6 +1,8 @@
-from flask import Flask, request, jsonify
-from transformers import AutoTokenizer, AutoModelForSeq2SeqLM
+from transformers import AutoTokenizer, AutoModelForSeq2SeqLM, TextIteratorStreamer
 import os
+from threading import Thread
+import asyncio
+import websockets
 
 def load_model(path):
     model = AutoModelForSeq2SeqLM.from_pretrained(path)
@@ -17,22 +19,30 @@ def load_models(directory):
 
 models = load_models('models')
 
-app = Flask(__name__)
+async def handler(websocket, path):
+    async for content in websocket:
+        model = path.lstrip('/')
+        if model not in models:
+            return await websocket.send('Not supported')
 
-@app.route('/<model>', methods=['POST'])
-def translate(model):
-    if model not in models:
-        return jsonify({ 'Message': 'Not supported' }), 400
+        model, tokenizer = models[model]
+        input_ids = tokenizer(content, return_tensors='pt').input_ids
+        streamer = TextIteratorStreamer(tokenizer, skip_prompt=True)
+        thread = Thread(target=model.generate, kwargs=dict(
+            input_ids=input_ids,
+            streamer=streamer,
+            num_beams=1,
+        ))
+        thread.start()
+        for text in streamer:
+            if text == '': continue
+            await websocket.send(text)
+        await websocket.close()
 
-    try:
-        content = request.get_json(force=True).get('Content', '')
-    except:
-        content = ''
-    if content == '':
-        return jsonify({ 'Message': 'Content not provided' }), 400
+async def main():
+    server = await websockets.serve(handler, 'localhost', 8765)
+    print("WebSocket server is running on ws://localhost:8765")
+    await server.wait_closed()
 
-    model, tokenizer = models[model]
-
-    result = tokenizer.decode(model.generate(tokenizer.encode(content, return_tensors='pt')).squeeze(), skip_special_tokens=True)
-
-    return jsonify({ 'Result': result })
+if __name__ == "__main__":
+    asyncio.run(main())
