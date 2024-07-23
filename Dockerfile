@@ -16,4 +16,4 @@ AutoModelForSeq2SeqLM.from_pretrained('Helsinki-NLP/opus-mt-zh-en').save_pretrai
 
 ADD main.py .
 
-CMD ["flask", "--debug", "--app", "main", "run", "--host=0.0.0.0", "--port=8181"]
+CMD ["python3", "main.py", "--addr=0.0.0.0", "--port=8765"]

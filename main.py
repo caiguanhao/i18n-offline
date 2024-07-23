@@ -3,6 +3,7 @@ import os
 from threading import Thread
 import asyncio
 import websockets
+import argparse
 
 def load_model(path):
     model = AutoModelForSeq2SeqLM.from_pretrained(path)
@@ -36,13 +37,18 @@ async def handler(websocket, path):
         thread.start()
         for text in streamer:
             if text == '': continue
+            if text[-4:] == "</s>": text = text[:-4]
             await websocket.send(text)
         await websocket.close()
 
-async def main():
-    server = await websockets.serve(handler, 'localhost', 8765)
-    print("WebSocket server is running on ws://localhost:8765")
+async def main(addr, port):
+    server = await websockets.serve(handler, addr, port)
+    print(f"WebSocket server is running on {addr}:{port}")
     await server.wait_closed()
 
 if __name__ == "__main__":
-    asyncio.run(main())
+    parser = argparse.ArgumentParser(description='WebSocket Server')
+    parser.add_argument('--addr', type=str, default='127.0.0.1', help='Address to bind the server, defaults to 127.0.0.1')
+    parser.add_argument('--port', type=int, default=8765, help='Port to bind the server, defaults to 8765')
+    args = parser.parse_args()
+    asyncio.run(main(args.addr, args.port))
