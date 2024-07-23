@@ -20,3 +20,5 @@ Wikipedia is a multilingual, content-free and collaborative programme in which a
 ![i18n-offline](https://github.com/user-attachments/assets/ef657c96-ce79-4320-b177-7549619ea46d)
 
 For more models, see <https://huggingface.co/Helsinki-NLP>.
+
+Server requirement: at least 2GB memory and 10GB free space.
