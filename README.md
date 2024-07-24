@@ -17,7 +17,13 @@ echo '维基百科是一个多语言、内容自由、任何人都能参与的�
 Wikipedia is a multilingual, content-free and collaborative programme in which anyone can participate, with the goal of creating a complete, accurate and neutral encyclopedia.
 ```
 
+Use as a command in terminal:
+
 ![i18n-offline](https://github.com/user-attachments/assets/ef657c96-ce79-4320-b177-7549619ea46d)
+
+Use in a web page:
+
+![i18n-web](https://github.com/user-attachments/assets/934acc54-9d9d-42ff-89a2-287a74ec006a)
 
 For more models, see <https://huggingface.co/Helsinki-NLP>.
 
