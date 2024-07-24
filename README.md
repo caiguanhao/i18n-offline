@@ -19,7 +19,7 @@ Wikipedia is a multilingual, content-free and collaborative programme in which a
 
 Use as a command in terminal:
 
-![i18n-offline](https://github.com/user-attachments/assets/ef657c96-ce79-4320-b177-7549619ea46d)
+![i18n-offline](https://github.com/user-attachments/assets/3e535b60-33e3-47b2-ad0d-a26e6a64a0db)
 
 Use in a web page:
 
