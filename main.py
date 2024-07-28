@@ -27,18 +27,24 @@ async def handler(websocket, path):
             return await websocket.send('Not supported')
 
         model, tokenizer = models[model]
-        input_ids = tokenizer(content, return_tensors='pt').input_ids
-        streamer = TextIteratorStreamer(tokenizer, skip_prompt=True)
-        thread = Thread(target=model.generate, kwargs=dict(
-            input_ids=input_ids,
-            streamer=streamer,
-            num_beams=1,
-        ))
-        thread.start()
-        for text in streamer:
-            if text == '': continue
-            if text[-4:] == "</s>": text = text[:-4]
-            await websocket.send(text)
+        paragraphs = content.split('\n')
+        for paragraph in paragraphs:
+            if not paragraph.strip():
+                await websocket.send('\n')
+                continue
+            input_ids = tokenizer(paragraph, return_tensors='pt', truncation=True).input_ids
+            streamer = TextIteratorStreamer(tokenizer, skip_prompt=True)
+            thread = Thread(target=model.generate, kwargs=dict(
+                input_ids=input_ids,
+                streamer=streamer,
+                num_beams=1,
+            ))
+            thread.start()
+            for text in streamer:
+                if text == '': continue
+                if text[-4:] == "</s>": text = text[:-4]
+                await websocket.send(text)
+            await websocket.send('\n')
         await websocket.close()
 
 async def main(addr, port):
