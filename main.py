@@ -25,13 +25,11 @@ async def handler(websocket, path):
         model = path.lstrip('/')
         if model not in models:
             return await websocket.send('Not supported')
-
         model, tokenizer = models[model]
         paragraphs = content.split('\n')
-        for paragraph in paragraphs:
-            if not paragraph.strip():
-                await websocket.send('\n')
-                continue
+        for i, paragraph in enumerate(paragraphs):
+            if i > 0: await websocket.send('\n')
+            if not paragraph.strip(): continue
             input_ids = tokenizer(paragraph, return_tensors='pt', truncation=True).input_ids
             streamer = TextIteratorStreamer(tokenizer, skip_prompt=True)
             thread = Thread(target=model.generate, kwargs=dict(
@@ -44,8 +42,7 @@ async def handler(websocket, path):
                 if text == '': continue
                 if text[-4:] == "</s>": text = text[:-4]
                 await websocket.send(text)
-            await websocket.send('\n')
-        await websocket.close()
+        return
 
 async def main(addr, port):
     server = await websockets.serve(handler, addr, port)
