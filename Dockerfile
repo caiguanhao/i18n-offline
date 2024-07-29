@@ -6,13 +6,9 @@ ADD requirements.txt .
 
 RUN pip install --no-cache-dir -r requirements.txt
 
-RUN python3 -c "from transformers import AutoTokenizer, AutoModelForSeq2SeqLM; \
-AutoTokenizer.from_pretrained('Helsinki-NLP/opus-mt-en-zh').save_pretrained('models/en-zh'); \
-AutoModelForSeq2SeqLM.from_pretrained('Helsinki-NLP/opus-mt-en-zh').save_pretrained('models/en-zh');"
+ADD download.py .
 
-RUN python3 -c "from transformers import AutoTokenizer, AutoModelForSeq2SeqLM; \
-AutoTokenizer.from_pretrained('Helsinki-NLP/opus-mt-zh-en').save_pretrained('models/zh-en'); \
-AutoModelForSeq2SeqLM.from_pretrained('Helsinki-NLP/opus-mt-zh-en').save_pretrained('models/zh-en');"
+RUN python3 download.py en-zh zh-en && rm -rf /root/.cache/huggingface
 
 ADD main.py .
 

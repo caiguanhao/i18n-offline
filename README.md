@@ -3,6 +3,15 @@
 Run:
 
 ```
+python3 -m venv .venv
+source .venv/bin/activate
+python3 download.py en-zh zh-en
+python3 main.py
+```
+
+Run in docker:
+
+```
 docker build -t i18n .
 docker run -d --rm -p 8765:8765 --name i18n i18n
 ```

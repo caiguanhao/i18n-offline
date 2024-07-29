@@ -1,11 +1,12 @@
 from transformers import AutoTokenizer, AutoModelForSeq2SeqLM, TextIteratorStreamer
-import os
+import os, sys
 from threading import Thread
 import asyncio
 import websockets
 import argparse
 
 def load_model(path):
+    sys.stderr.write(f"Loading {path}...\n")
     model = AutoModelForSeq2SeqLM.from_pretrained(path)
     tokenizer = AutoTokenizer.from_pretrained(path)
     return model, tokenizer
